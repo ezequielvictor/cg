@@ -1,5 +1,5 @@
 #include "P1.h"
-
+#include <iostream>
 namespace cg
 { // begin namespace cg
 
@@ -66,8 +66,19 @@ P1::buildScene()
 {
   _current = _scene = new Scene{"Scene 1"};
   _box = new SceneObject{"Box 1", _scene};
+  _scene->addObjectScene(*_box);
   _primitive = makeBoxMesh();
+  /*
+  SceneObject* _box2 = new SceneObject{ "Box 2", _scene };
+ 
+  SceneObject*  _box3 = new SceneObject{ "Box 3", nullptr};
+ 
+  SceneObject* _box4 = new SceneObject{ "Box 3", _box2};
+
+  SceneObject* _box5 = new SceneObject{ "Box 3", _box4 };
+  */
 }
+
 
 void
 P1::initialize()
@@ -101,6 +112,7 @@ P1::hierarchyWindow()
       if (ImGui::MenuItem("Box"))
       {
         // TODO: create a new box.
+		 
       }
       ImGui::EndMenu();
     }
@@ -130,6 +142,9 @@ P1::hierarchyWindow()
 
 namespace ImGui
 { // begin namespace ImGui
+
+
+
 
 void
 ObjectNameInput(SceneNode* object)

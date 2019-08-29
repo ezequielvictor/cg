@@ -1,8 +1,5 @@
-﻿  imgui_demo.cpp
-  Main.cpp
-  SceneNode.cpp
-  P1.cpp
-  SceneObject.cpp
-  Transform.cpp
-  Gerando Código...
-  p1.vcxproj -> C:\Users\Victor Ezequiel\Desktop\cg-master-b10aef091551f309ace61aa83367a5ab7fc705ce\cg\p1\build\vs2019\..\..\p1.exe
+﻿  P1.cpp
+C:\Users\Victor Ezequiel\Desktop\cg-master-b10aef091551f309ace61aa83367a5ab7fc705ce\cg\p1\P1.cpp(76,55): error C2440:  'inicializando': não é possível converter de 'initializer list' para 'cg::SceneObject'
+C:\Users\Victor Ezequiel\Desktop\cg-master-b10aef091551f309ace61aa83367a5ab7fc705ce\cg\p1\P1.cpp(76,55): message :  Nenhum construtor pôde receber o tipo de origem, ou resolução de sobrecarga de construtor foi ambígua
+C:\Users\Victor Ezequiel\Desktop\cg-master-b10aef091551f309ace61aa83367a5ab7fc705ce\cg\p1\P1.cpp(78,56): error C2440:  'inicializando': não é possível converter de 'initializer list' para 'cg::SceneObject'
+C:\Users\Victor Ezequiel\Desktop\cg-master-b10aef091551f309ace61aa83367a5ab7fc705ce\cg\p1\P1.cpp(78,56): message :  Nenhum construtor pôde receber o tipo de origem, ou resolução de sobrecarga de construtor foi ambígua

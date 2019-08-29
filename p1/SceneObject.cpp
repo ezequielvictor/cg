@@ -31,6 +31,7 @@
 // Last revision: 25/08/2018
 
 #include "SceneObject.h"
+#include "Scene.h"
 
 namespace cg
 { // begin namespace cg
@@ -40,10 +41,49 @@ namespace cg
 //
 // SceneObject implementation
 // ===========
+
+
+
+auto
+SceneObject::addSceneObjectChild(SceneObject* child)
+{
+	sceneObjectList.push_back(child);
+}
+
+auto 
+SceneObject::removeSceneObjectChild(SceneObject* child)
+{
+	sceneObjectList.remove(child);
+}
+
 void
 SceneObject::setParent(SceneObject* parent)
 {
-  // TODO
+	//Se o pai atual é diferente do novo pai:
+
+	if (this->parent() != nullptr) {
+		this->_parent->removeSceneObjectChild(this);
+	
+	}
+	if (parent != nullptr) {
+		parent->addSceneObjectChild(this);
+		this->_parent = parent;
+	}else {
+		scene()->addObjectScene(*this);
+	}
+	
 }
+auto
+SceneObject::addComponent(Component* component)
+{
+	this->componentList.push_back(component);
+}
+
+auto 
+SceneObject::removeComponent(Component* component)
+{
+	componentList.remove(component);
+}
+
 
 } // end namespace cg

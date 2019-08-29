@@ -35,6 +35,7 @@
 
 #include "SceneObject.h"
 #include "graphics/Color.h"
+#include <list>
 
 namespace cg
 { // begin namespace cg
@@ -46,6 +47,10 @@ namespace cg
 // =====
 class Scene: public SceneNode
 {
+private:
+	std::list<SceneObject*> lista;
+	 //TODO este iterador nao referencia a lista obrigatoriamente. arrumar/
+
 public:
   Color backgroundColor{Color::gray};
 
@@ -56,7 +61,27 @@ public:
     // do nothing
   }
 
+ void
+	 removeSceneObject(SceneObject a) {
+	 Scene::lista.push_back(&a);
+ }
+	
+  void
+	 addObjectScene(SceneObject o) {
+	 Scene::lista.remove(&o);
+  }
+
+/*
+ SceneObject
+	  searcheObject(SceneObject o) {
+		std::list<SceneObject*>::iterator it;
+		for (it = lista.begin(); it != &o; it++) {
+			return *it;
+		}
+  }*/
+
 }; // Scene
+	
 
 } // end namespace cg
 

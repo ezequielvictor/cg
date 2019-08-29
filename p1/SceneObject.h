@@ -35,6 +35,8 @@
 
 #include "SceneNode.h"
 #include "Transform.h"
+#include "Component.h"
+#include <list>
 
 namespace cg
 { // begin namespace cg
@@ -51,6 +53,7 @@ class SceneObject: public SceneNode
 {
 public:
   bool visible{true};
+  
 
   /// Constructs an empty scene object.
   SceneObject(const char* name, Scene* scene):
@@ -73,6 +76,18 @@ public:
     return _parent;
   }
 
+//Adiciona um objeto de cena (filho) a coleção de objetos de cena de um objeto de cena
+auto addSceneObjectChild(SceneObject* child);
+
+//remove um objeto de cena (filho) da coleção de objetos de cena de um objeto de cena
+auto removeSceneObjectChild(SceneObject* child);
+
+//Adiciona um componente a coleção de componentes de um objeto de cena
+auto addComponent(Component* component);
+
+//remove um componente a coleção de componentes de um objeto de cena
+auto removeComponent(Component* component);
+
   /// Sets the parent of this scene object.
   void setParent(SceneObject* parent);
 
@@ -86,6 +101,8 @@ private:
   Scene* _scene;
   SceneObject* _parent;
   Transform _transform;
+  std::list<SceneObject*> sceneObjectList; 
+  std::list<Component*> componentList;
 
   friend class Scene;
 
