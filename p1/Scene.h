@@ -71,14 +71,15 @@ public:
 	 Scene::lista.remove(&o);
   }
 
-/*
+
  SceneObject
-	  searcheObject(SceneObject o) {
-		std::list<SceneObject*>::iterator it;
-		for (it = lista.begin(); it != &o; it++) {
-			return *it;
+	  searcheObject(SceneObject o, std::list<SceneObject> lista) {
+		std::list<SceneObject>::iterator it;
+		for (it = lista.begin(); it != lista.end(); it++) {
+			//blablabla
 		}
-  }*/
+		return *it;
+  }
 
 }; // Scene
 	
