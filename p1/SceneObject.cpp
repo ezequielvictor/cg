@@ -32,6 +32,8 @@
 
 #include "SceneObject.h"
 #include "Scene.h"
+#include "Primitive.h"
+#include <list>
 
 namespace cg
 { // begin namespace cg
@@ -44,42 +46,58 @@ namespace cg
 
 
 
-auto
+void
 SceneObject::addSceneObjectChild(SceneObject* child)
 {
 	sceneObjectList.push_back(child);
 }
 
-auto 
+void 
 SceneObject::removeSceneObjectChild(SceneObject* child)
 {
 	sceneObjectList.remove(child);
 }
-
 void
 SceneObject::setParent(SceneObject* parent)
 {
 	//Se o pai atual é diferente do novo pai:
+	if (this->parent() != nullptr)
+	{
+	  // O antigo pai foi removido
+	  this->_parent->removeSceneObjectChild(this);
+	}
+	else
+	{
+	  //A cena removeu o objeto
+	  this->scene()->removeSceneObject(this);
+	}
 
-	if (this->parent() != nullptr) {
-		this->_parent->removeSceneObjectChild(this);
-	
+	if (parent != nullptr)
+	{
+	  //Objeto foi adicionado a cena
+	  parent->addSceneObjectChild(this);
+	  this->_parent = parent;
 	}
-	if (parent != nullptr) {
-		parent->addSceneObjectChild(this);
-		this->_parent = parent;
-	}else {
-		scene()->addObjectScene(*this);
+	else
+	{
+	  //Cena adicionou o objeto
+	  scene()->addObjectScene(this);
 	}
-	
 }
-auto
+
+
+void
 SceneObject::addComponent(Component* component)
 {
+	//Caso o component seja um primitivo
+	Primitive* _primitive = dynamic_cast<Primitive*>(component);
+	if (_primitive != nullptr)
+		setPrimitive(_primitive);
+
 	this->componentList.push_back(component);
 }
 
-auto 
+void 
 SceneObject::removeComponent(Component* component)
 {
 	componentList.remove(component);

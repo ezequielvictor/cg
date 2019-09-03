@@ -48,9 +48,8 @@ namespace cg
 class Scene: public SceneNode
 {
 private:
-	std::list<SceneObject*> lista;
-	 //TODO este iterador nao referencia a lista obrigatoriamente. arrumar/
-
+	std::list<SceneObject*> sceneObjectList;
+	
 public:
   Color backgroundColor{Color::gray};
 
@@ -61,25 +60,25 @@ public:
     // do nothing
   }
 
- void
-	 removeSceneObject(SceneObject a) {
-	 Scene::lista.push_back(&a);
- }
+int 
+sizeReturn() {
+  return sceneObjectList.size();
+}
+
+auto 
+listReturn() {
+  return sceneObjectList;
+}
+
+void
+removeSceneObject(SceneObject* a) {
+  sceneObjectList.remove(a);
+}
 	
-  void
-	 addObjectScene(SceneObject o) {
-	 Scene::lista.remove(&o);
-  }
-
-
- SceneObject
-	  searcheObject(SceneObject o, std::list<SceneObject> lista) {
-		std::list<SceneObject>::iterator it;
-		for (it = lista.begin(); it != lista.end(); it++) {
-			//blablabla
-		}
-		return *it;
-  }
+void
+addObjectScene(SceneObject* o) {
+  sceneObjectList.insert(sceneObjectList.begin(), o);
+}
 
 }; // Scene
 	

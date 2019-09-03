@@ -1,5 +1,6 @@
 #include "P1.h"
 #include <iostream>
+#include <string>
 namespace cg
 { // begin namespace cg
 
@@ -66,17 +67,23 @@ P1::buildScene()
 {
   _current = _scene = new Scene{"Scene 1"};
   _box = new SceneObject{"Box 1", _scene};
-  _scene->addObjectScene(*_box);
+ 
   _primitive = makeBoxMesh();
-  /*
-  SceneObject* _box2 = new SceneObject{ "Box 2", _scene };
- 
-  SceneObject*  _box3 = new SceneObject{ "Box 3", nullptr};
- 
-  SceneObject* _box4 = new SceneObject{ "Box 3", _box2};
+  _box->setPrimitive(_primitive);
+  _box->setParent(nullptr);
 
-  SceneObject* _box5 = new SceneObject{ "Box 3", _box4 };
-  */
+  /*SceneObject* _box2 = new SceneObject{ "Object 1", _scene };
+  _box2->setParent(nullptr);
+  
+  SceneObject* _box3 = new SceneObject{ "Object 2", _scene };
+  _box3->setParent(_box);
+
+  SceneObject* _box4 = new SceneObject{ "Object 3", _scene };
+  _box4->setParent(_box);
+
+  SceneObject* _box5 = new SceneObject{ "Object 4", _scene };
+  _box5->setParent(_box3);*/
+  
 }
 
 
@@ -106,13 +113,48 @@ P1::hierarchyWindow()
     ImGui::OpenPopup("CreateObjectPopup");
   if (ImGui::BeginPopup("CreateObjectPopup"))
   {
-    ImGui::MenuItem("Empty Object");
+	  if (ImGui::MenuItem("Empty Object")) {
+		  //create a new box
+		  P1::addCountObject();
+		  std::string objectName = "Object " + std::to_string(P1::getCountObject());
+		  char totalObject[100];
+		  strcpy_s(totalObject, objectName.c_str());
+
+		  SceneObject* _newObject = new SceneObject{totalObject, _scene };
+			  
+		  if (_current == _scene) {
+			  _newObject->setParent(nullptr);
+
+		  }
+		  else {
+			  _newObject->setParent(dynamic_cast<SceneObject*>(_current));
+			  
+		  }
+   }
     if (ImGui::BeginMenu("3D Object"))
     {
+		
       if (ImGui::MenuItem("Box"))
       {
-        // TODO: create a new box.
-		 
+
+		  P1::addCountBox();
+		  std::string boxName = "Box " + std::to_string(P1::getCountBox());
+		  char totalBox[100];
+		  strcpy_s(totalBox, boxName.c_str());
+
+          //create a new box.
+		  SceneObject* _newObject = new SceneObject{totalBox, _scene };
+		  _newObject->addComponent(makeBoxMesh());
+		  if (_current == _scene) {
+			  _newObject->setParent(nullptr); //Adicionando à raiz da cena.
+		  }
+		  else {
+			  _newObject->setParent(dynamic_cast<SceneObject*>(_current));
+
+		  }
+
+
+	//	  _newbox->setParent(_current);
       }
       ImGui::EndMenu();
     }
@@ -129,15 +171,57 @@ P1::hierarchyWindow()
     _current = _scene;
   if (open)
   {
+	  /*
     flag |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
     ImGui::TreeNodeEx(_box,
       _current == _box ? flag | ImGuiTreeNodeFlags_Selected : flag,
       _box->name());
     if (ImGui::IsItemClicked())
       _current = _box;
-    ImGui::TreePop();
+    ImGui::TreePop();*/
+	  for (auto o : _scene->listReturn()) {
+	    funcao(o, &flag);
+	  }
+	  ImGui::TreePop();
   }
   ImGui::End();
+}
+
+void
+P1::funcao(cg::SceneObject *obj, ImGuiTreeNodeFlags *flag) {
+	
+	
+	if (!obj->child().empty()) {
+		auto open = ImGui::TreeNodeEx(obj, _current == obj ? *flag | ImGuiTreeNodeFlags_Selected : *flag, obj->name());
+		if (ImGui::IsItemClicked()) {
+			_current = obj;
+		}
+
+		if (open) {
+			if (!obj->child().empty()) {
+				for (auto sc : obj->child()) {
+					funcao(sc, flag);
+				}
+
+				ImGui::TreePop();
+
+			}
+
+		}
+
+	}
+
+	else {
+		ImGuiTreeNodeFlags flag;
+
+		flag |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+			   		 	  
+		ImGui::TreeNodeEx(obj, _current == _scene ? flag | ImGuiTreeNodeFlags_Selected : flag, obj->name());
+			   
+		if (ImGui::IsItemClicked())
+			_current = obj;
+
+	}
 }
 
 namespace ImGui
@@ -215,6 +299,8 @@ P1::sceneObjectGui()
   ImGui::SameLine();
   ImGui::Checkbox("###visible", &object->visible);
   ImGui::Separator();
+
+  //TODO: FAZER UMA FUNÇÃO DE EXIBIÇÃO NO INSPETOR PARA CADA TIPO DE COMPONENT
   if (ImGui::CollapsingHeader(object->transform()->typeName()))
   {
     auto t = object->transform();
@@ -222,9 +308,16 @@ P1::sceneObjectGui()
     ImGui::TransformEdit(t);
     _transform = t->localToWorldMatrix();
   }
-  if (ImGui::CollapsingHeader(_primitive->typeName()))
+
+  
+  if (object->getPrimitive()!= nullptr && ImGui::CollapsingHeader(object->getPrimitive()->typeName()))
   {
     // TODO: show primitive properties.
+	  auto p = object->getPrimitive()->mesh();
+	  std::string vertices = "Numero de vertices " + std::to_string(p->vertexCount());
+	  char totalVertices[100];
+	  strcpy_s(totalVertices, vertices.c_str());
+	  ImGui::Text(totalVertices);
   }
 }
 
@@ -241,7 +334,7 @@ P1::objectGui()
   if (dynamic_cast<Scene*>(_current))
     sceneGui();
 }
-
+	
 inline void
 P1::inspectorWindow()
 {
@@ -265,19 +358,35 @@ void
 P1::render()
 {
   GLWindow::render();
-  if (!_box->visible)
-    return;
-  _program.setUniformMat4("transform", _transform);
+  for (auto o : _scene->listReturn()) {
+    func(o);
+  }
+}
 
-  auto m = _primitive->mesh();
+void
+P1::func(SceneObject* sceneObject) {
+	if (sceneObject->getPrimitive() != nullptr)
 
-  m->bind();
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glDrawElements(GL_TRIANGLES, m->vertexCount(), GL_UNSIGNED_INT, 0);
-  if (_current != _box)
-    return;
-  m->setVertexColor(selectedWireframeColor);  
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glDrawElements(GL_TRIANGLES, m->vertexCount(), GL_UNSIGNED_INT, 0);
-  m->useVertexColors();
+	if (sceneObject->visible && sceneObject->getPrimitive() != nullptr) {
+
+		_program.setUniformMat4("transform", sceneObject->transform()->localToWorldMatrix());
+
+		auto m = sceneObject->getPrimitive()->mesh();
+
+		m->bind();
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, m->vertexCount(), GL_UNSIGNED_INT, 0);
+		/*Para que o objeto selecionado apareça contornado*/
+		if (_current == sceneObject) {
+			m->setVertexColor(selectedWireframeColor);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glDrawElements(GL_TRIANGLES, m->vertexCount(), GL_UNSIGNED_INT, 0);
+			m->useVertexColors();
+		}
+	}
+		
+	for (auto o : sceneObject->child()) {
+	  func(o);
+	}
+
 }
